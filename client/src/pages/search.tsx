@@ -155,11 +155,7 @@ export default function SearchPage() {
                   </Button>
                 </div>
                 
-                <div className="text-center">
-                  <p className="text-sm text-secondary">
-                    Query will be constructed as: <code className="surface px-2 py-1 rounded text-primary">site:[domain] [keywords]</code>
-                  </p>
-                </div>
+                
               </form>
             </Form>
           </CardContent>
@@ -252,8 +248,7 @@ export default function SearchPage() {
             {/* Search Stats */}
             <div className="flex items-center justify-between bg-card rounded-lg border border-border p-4">
               <div className="flex items-center space-x-4">
-                <span className="text-secondary">Search results for:</span>
-                <code className="surface px-3 py-1 rounded text-primary text-sm">{currentQuery}</code>
+                <span className="text-secondary">Search results</span>
               </div>
               <div className="text-sm text-secondary">
                 <span>{searchResults.length}</span> results found in <span>{searchTime}s</span>
