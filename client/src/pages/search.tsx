@@ -228,10 +228,10 @@ export default function SearchPage() {
           <Card>
             <CardContent className="p-8 text-center">
               <div className="mb-4">
-                <Search className="text-secondary text-3xl mx-auto" />
+                <Search className="text-muted-foreground text-3xl mx-auto" />
               </div>
               <h3 className="text-xl font-semibold mb-2">No Results Found</h3>
-              <p className="text-secondary mb-6">
+              <p className="text-muted-foreground mb-6">
                 No content found for your search query. Try adjusting your keywords or checking the domain name.
               </p>
               <Button onClick={() => form.getValues("domain") && document.getElementById("domain")?.focus()}>
