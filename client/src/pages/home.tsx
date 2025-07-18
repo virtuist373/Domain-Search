@@ -604,15 +604,15 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-background">
-        <div className="max-w-6xl mx-auto px-6 py-4 text-center">
-          <p className="text-sm text-muted-foreground">
+      <footer className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-6 py-2 text-center">
+          <p className="text-xs text-muted-foreground/60">
             Made by{' '}
             <a 
               href="https://tannerbraden.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 transition-colors"
+              className="text-muted-foreground/80 hover:text-muted-foreground transition-colors"
             >
               Tanner Braden
             </a>
