@@ -49,6 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 async function performSearch(domain: string, keyword: string) {
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -57,34 +58,64 @@ async function performSearch(domain: string, keyword: string) {
       '--no-first-run',
       '--no-zygote',
       '--single-process',
-      '--disable-gpu'
+      '--disable-gpu',
+      '--disable-features=VizDisplayCompositor'
     ]
   });
 
   try {
     const page = await browser.newPage();
     
-    // Set user agent to avoid detection
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    // Set user agent and other headers to avoid detection
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36');
+    await page.setExtraHTTPHeaders({
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+      'Connection': 'keep-alive',
+      'Upgrade-Insecure-Requests': '1',
+    });
     
     // Construct Google search query
     const searchQuery = `site:${domain} ${keyword}`;
     const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&num=10`;
     
     // Navigate to Google search
-    await page.goto(searchUrl, { waitUntil: 'networkidle2' });
+    await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     
-    // Wait for search results to load
-    await page.waitForSelector('div[data-ved]', { timeout: 10000 });
+    // Wait for page to load and try multiple selectors
+    await page.waitForTimeout(3000);
+    
+    // Check if we have search results
+    const hasResults = await page.evaluate(() => {
+      return document.querySelectorAll('div[data-ved]').length > 0 || 
+             document.querySelectorAll('.g').length > 0 ||
+             document.querySelectorAll('[data-sokoban-container]').length > 0;
+    });
+    
+    if (!hasResults) {
+      throw new Error('No search results found - page may have been blocked');
+    }
     
     // Extract search results
     const results = await page.evaluate(() => {
       const searchResults: Array<{title: string, url: string, snippet: string}> = [];
       
-      // Select search result containers
-      const resultElements = document.querySelectorAll('div[data-ved] h3');
+      // Try multiple selector strategies
+      let resultElements: NodeListOf<Element> | null = null;
       
-      resultElements.forEach((titleElement, index) => {
+      // Strategy 1: Modern Google layout
+      resultElements = document.querySelectorAll('div[data-ved] h3');
+      if (resultElements.length === 0) {
+        // Strategy 2: Alternative layout
+        resultElements = document.querySelectorAll('.g h3');
+      }
+      if (resultElements.length === 0) {
+        // Strategy 3: Fallback
+        resultElements = document.querySelectorAll('[data-sokoban-container] h3');
+      }
+      
+      resultElements?.forEach((titleElement, index) => {
         if (index >= 10) return; // Limit to 10 results
         
         const title = titleElement.textContent?.trim() || '';
@@ -93,15 +124,22 @@ async function performSearch(domain: string, keyword: string) {
         const linkElement = titleElement.closest('a') as HTMLAnchorElement;
         const url = linkElement?.href || '';
         
-        // Find the snippet
+        // Find the snippet with multiple strategies
         let snippet = '';
-        const resultContainer = titleElement.closest('div[data-ved]');
+        const resultContainer = titleElement.closest('div[data-ved]') || titleElement.closest('.g');
         if (resultContainer) {
-          const snippetElement = resultContainer.querySelector('span:not([class])');
+          // Try different snippet selectors
+          let snippetElement = resultContainer.querySelector('span:not([class])');
+          if (!snippetElement) {
+            snippetElement = resultContainer.querySelector('.VwiC3b');
+          }
+          if (!snippetElement) {
+            snippetElement = resultContainer.querySelector('[data-content-feature]');
+          }
           snippet = snippetElement?.textContent?.trim() || '';
         }
         
-        if (title && url && !url.includes('google.com')) {
+        if (title && url && !url.includes('google.com') && !url.includes('googleusercontent.com')) {
           searchResults.push({ title, url, snippet });
         }
       });

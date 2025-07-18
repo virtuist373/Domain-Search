@@ -71,23 +71,21 @@ export default function SearchPage() {
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Search className="text-primary text-xl" />
-              <h1 className="text-xl font-semibold">Domain Search Tool</h1>
+              <Search className="text-primary h-6 w-6" />
+              <h1 className="text-xl font-semibold">Domain Search</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-secondary">Powered by Google Search</span>
-            </div>
+
           </div>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-8">
         {/* Search Form */}
-        <Card className="mb-8 shadow-lg">
+        <Card className="mb-8">
           <CardContent className="p-8">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-semibold mb-2">Search Domain-Specific Content</h2>
-              <p className="text-secondary">Find content from specific domains using targeted Google searches</p>
+              <p className="text-muted-foreground">Find content from specific domains using targeted Google searches</p>
             </div>
             
             <Form {...form}>
@@ -145,7 +143,7 @@ export default function SearchPage() {
                 <div className="flex justify-center">
                   <Button 
                     type="submit" 
-                    className="px-8 py-3 font-medium flex items-center space-x-2"
+                    className="px-8 py-2 font-medium flex items-center space-x-2"
                     disabled={searchMutation.isPending}
                   >
                     {searchMutation.isPending ? (
@@ -153,7 +151,7 @@ export default function SearchPage() {
                     ) : (
                       <Search className="h-4 w-4" />
                     )}
-                    <span>{searchMutation.isPending ? "Searching..." : "Search Domain"}</span>
+                    <span>{searchMutation.isPending ? "Searching..." : "Search"}</span>
                   </Button>
                 </div>
                 
@@ -265,39 +263,27 @@ export default function SearchPage() {
             {/* Results List */}
             <div className="space-y-4">
               {searchResults.map((result, index) => (
-                <Card key={index} className="hover:border-primary/50 transition-all duration-200 shadow-sm hover:shadow-md">
+                <Card key={index} className="hover:border-primary/20 transition-all duration-200">
                   <CardContent className="p-6">
                     <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <h3 className="text-lg font-semibold hover:text-primary cursor-pointer transition-colors duration-200">
-                          <a href={result.url} target="_blank" rel="noopener noreferrer">
-                            {result.title}
-                          </a>
-                        </h3>
-                        <ExternalLink className="text-secondary text-sm mt-1 flex-shrink-0 ml-2" />
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 text-sm">
-                        <ExternalLink className="text-secondary h-4 w-4" />
-                        <a 
-                          href={result.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-secondary hover:text-green-400 transition-colors duration-200 truncate"
-                        >
-                          {result.url}
+                      <h3 className="text-lg font-semibold hover:text-primary cursor-pointer transition-colors">
+                        <a href={result.url} target="_blank" rel="noopener noreferrer">
+                          {result.title}
                         </a>
-                      </div>
+                      </h3>
                       
-                      <p className="text-secondary leading-relaxed">
+                      <a 
+                        href={result.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors truncate block"
+                      >
+                        {result.url}
+                      </a>
+                      
+                      <p className="text-muted-foreground leading-relaxed">
                         {result.snippet}
                       </p>
-                      
-                      <div className="flex items-center justify-between pt-2 border-t border-border">
-                        <div className="flex items-center space-x-4 text-xs text-secondary">
-                          <span><Clock className="h-3 w-3 inline mr-1" />Domain: {result.domain}</span>
-                        </div>
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -306,40 +292,6 @@ export default function SearchPage() {
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border bg-card mt-16">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h4 className="font-semibold mb-4">About</h4>
-              <p className="text-secondary text-sm leading-relaxed">
-                Domain Search Tool helps you find specific content within domains using Google's search capabilities with Puppeteer automation.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Features</h4>
-              <ul className="text-secondary text-sm space-y-2">
-                <li>✓ Domain-specific searches</li>
-                <li>✓ Automated result extraction</li>
-                <li>✓ Clean result formatting</li>
-                <li>✓ Error handling & retries</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Technology</h4>
-              <ul className="text-secondary text-sm space-y-2">
-                <li>🤖 Puppeteer headless browser</li>
-                <li>🔍 Google search integration</li>
-                <li>💻 Modern web technologies</li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border mt-8 pt-8 text-center text-secondary text-sm">
-            <p>&copy; 2024 Domain Search Tool. Built with modern web technologies.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
