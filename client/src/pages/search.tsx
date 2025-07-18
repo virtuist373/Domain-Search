@@ -408,6 +408,23 @@ export default function SearchPage() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border bg-background mt-16">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="text-center text-sm text-muted-foreground">
+            Created by{" "}
+            <a 
+              href="https://tannerbraden.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Tanner Braden
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
