@@ -87,7 +87,7 @@ export default function SearchPage() {
               <h2 className="text-2xl font-semibold mb-2">Search Domain-Specific Content</h2>
               <p className="text-muted-foreground">Find content from specific domains using targeted Google searches</p>
             </div>
-            
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -114,7 +114,7 @@ export default function SearchPage() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="keyword"
@@ -139,7 +139,7 @@ export default function SearchPage() {
                     )}
                   />
                 </div>
-                
+
                 <div className="flex justify-center">
                   <Button 
                     type="submit" 
@@ -154,8 +154,8 @@ export default function SearchPage() {
                     <span>{searchMutation.isPending ? "Searching..." : "Search"}</span>
                   </Button>
                 </div>
-                
-                
+
+
               </form>
             </Form>
           </CardContent>
@@ -172,7 +172,7 @@ export default function SearchPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             {/* Skeleton Loading Cards */}
             <div className="space-y-4">
               {[1, 2].map((i) => (
@@ -266,7 +266,7 @@ export default function SearchPage() {
                           {result.title}
                         </a>
                       </h3>
-                      
+
                       <a 
                         href={result.url} 
                         target="_blank" 
@@ -275,7 +275,7 @@ export default function SearchPage() {
                       >
                         {result.url}
                       </a>
-                      
+
                       <p className="text-muted-foreground leading-relaxed">
                         {result.snippet}
                       </p>

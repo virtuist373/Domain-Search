@@ -46,4 +46,10 @@
   .text-secondary {
     color: var(--text-secondary);
   }
+  
+  .header-text {
+    color: var(--foreground);
+    font-weight: 500;
+    opacity: 0.9;
+  }
 }
