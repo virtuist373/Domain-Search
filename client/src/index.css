@@ -24,7 +24,7 @@
   --ring: hsl(0, 0%, 20%);
   --radius: 0.5rem;
   --surface: hsl(0, 0%, 14%);
-  --text-secondary: hsl(0, 0%, 60%);
+  --text-secondary: hsl(0, 0%, 75%);
 }
 
 @layer base {
