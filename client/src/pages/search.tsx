@@ -131,7 +131,7 @@ export default function SearchPage() {
           <CardContent className="p-8">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-semibold mb-2">Search Domain-Specific Content</h2>
-              <p className="text-muted-foreground">Find content from specific domains using targeted Google searches</p>
+              <p className="text-muted-foreground">Find pages from specific domains that mention specific keywords</p>
             </div>
 
             <Form {...form}>
