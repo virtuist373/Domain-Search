@@ -602,6 +602,23 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border bg-background">
+        <div className="max-w-6xl mx-auto px-6 py-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            Made by{' '}
+            <a 
+              href="https://tannerbraden.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary/80 transition-colors"
+            >
+              Tanner Braden
+            </a>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
