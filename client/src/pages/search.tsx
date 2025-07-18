@@ -294,8 +294,8 @@ export default function SearchPage() {
             {/* Search Stats */}
             <div className="flex items-center justify-between bg-card rounded-lg border border-border p-4">
               <div className="flex items-center space-x-4">
-                <span className="text-secondary">Search results</span>
-                <div className="text-sm text-secondary">
+                <span className="text-muted-foreground">Search results</span>
+                <div className="text-sm text-muted-foreground">
                   <span>{searchResults.length}</span> results found in <span>{searchTime}s</span>
                 </div>
               </div>
