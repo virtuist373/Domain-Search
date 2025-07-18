@@ -321,7 +321,7 @@ export default function Home() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => window.open('https://chatgpt.com/g/g-687a991a6b648191a27b5c3c4a7c40a8-natural-brand-placement-scout', '_blank')}
+                              onClick={() => window.open('https://chatgpt.com/g/g-687a991a6b648191a27b5c3c4a7c40a8', '_blank')}
                               className="flex items-center space-x-2 bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 hover:border-green-500/40 transition-all"
                             >
                               <Target className="h-4 w-4 text-green-500" />
@@ -607,7 +607,7 @@ export default function Home() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => window.open('https://chatgpt.com/g/g-687a991a6b648191a27b5c3c4a7c40a8-natural-brand-placement-scout', '_blank')}
+                            onClick={() => window.open('https://chatgpt.com/g/g-687a991a6b648191a27b5c3c4a7c40a8', '_blank')}
                             className="flex items-center space-x-2 bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 hover:border-green-500/40 transition-all"
                           >
                             <Target className="h-4 w-4 text-green-500" />
