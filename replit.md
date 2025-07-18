@@ -7,6 +7,7 @@ This is a web scraping application built with React frontend, Express backend, a
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+App architecture: Single-page application without routing flashes.
 
 ## System Architecture
 
