@@ -3,22 +3,48 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { searchQuerySchema } from "@shared/schema";
 import { ZodError } from "zod";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Search endpoint
-  app.post("/api/search", async (req, res) => {
+  // Setup Replit Auth
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Search endpoint - updated to work with authenticated users
+  app.post("/api/search", isAuthenticated, async (req: any, res) => {
     try {
       // Validate request body
       const { domain, keyword } = searchQuerySchema.parse(req.body);
       
-      // Perform search using Puppeteer
+      // Get user ID from auth
+      const userId = req.user.claims.sub;
+      
+      // Perform search using Serper API
       const results = await performSearch(domain, keyword);
       
-      // Store results (optional - for caching or analytics)
+      // Create search history entry
+      const searchHist = await storage.createSearchHistory({
+        userId,
+        domain,
+        keyword,
+        resultsCount: results.length,
+      });
+      
+      // Store individual search results
       for (const result of results) {
         await storage.createSearchResult({
-          domain,
-          keyword,
+          searchHistoryId: searchHist.id,
           title: result.title,
           url: result.url,
           snippet: result.snippet,
@@ -38,6 +64,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: "Search failed. Please try again later."
       });
+    }
+  });
+
+  // Search history endpoint
+  app.get("/api/search-history", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const history = await storage.getUserSearchHistory(userId);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching search history:", error);
+      res.status(500).json({ message: "Failed to fetch search history" });
     }
   });
 

@@ -1,59 +1,90 @@
-import { users, searchResults, type User, type InsertUser, type SearchResult, type InsertSearchResult } from "@shared/schema";
+import { 
+  users, 
+  searchResults, 
+  searchHistory,
+  type User, 
+  type UpsertUser, 
+  type SearchResult, 
+  type InsertSearchResult,
+  type SearchHistory,
+  type InsertSearchHistory,
+  type SearchHistoryWithResults
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  // User operations for Replit Auth
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
+  // Search history operations
+  createSearchHistory(history: InsertSearchHistory): Promise<SearchHistory>;
+  getUserSearchHistory(userId: string): Promise<SearchHistoryWithResults[]>;
+  
+  // Search results operations
   createSearchResult(result: InsertSearchResult): Promise<SearchResult>;
-  getSearchResults(domain: string, keyword: string): Promise<SearchResult[]>;
+  getSearchResults(searchHistoryId: number): Promise<SearchResult[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private searchResults: Map<number, SearchResult>;
-  private currentUserId: number;
-  private currentSearchId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.searchResults = new Map();
-    this.currentUserId = 1;
-    this.currentSearchId = 1;
-  }
-
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+export class DatabaseStorage implements IStorage {
+  // User operations for Replit Auth
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
-  async createSearchResult(insertResult: InsertSearchResult): Promise<SearchResult> {
-    const id = this.currentSearchId++;
-    const result: SearchResult = { 
-      ...insertResult, 
-      id,
-      createdAt: new Date()
-    };
-    this.searchResults.set(id, result);
-    return result;
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
   }
 
-  async getSearchResults(domain: string, keyword: string): Promise<SearchResult[]> {
-    return Array.from(this.searchResults.values()).filter(
-      (result) => result.domain === domain && result.keyword === keyword,
-    );
+  // Search history operations
+  async createSearchHistory(history: InsertSearchHistory): Promise<SearchHistory> {
+    const [searchHist] = await db
+      .insert(searchHistory)
+      .values(history)
+      .returning();
+    return searchHist;
+  }
+
+  async getUserSearchHistory(userId: string): Promise<SearchHistoryWithResults[]> {
+    const historiesWithResults = await db.query.searchHistory.findMany({
+      where: eq(searchHistory.userId, userId),
+      orderBy: [desc(searchHistory.createdAt)],
+      with: {
+        results: true,
+      },
+    });
+
+    return historiesWithResults;
+  }
+
+  // Search results operations
+  async createSearchResult(result: InsertSearchResult): Promise<SearchResult> {
+    const [searchResult] = await db
+      .insert(searchResults)
+      .values(result)
+      .returning();
+    return searchResult;
+  }
+
+  async getSearchResults(searchHistoryId: number): Promise<SearchResult[]> {
+    return await db
+      .select()
+      .from(searchResults)
+      .where(eq(searchResults.searchHistoryId, searchHistoryId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
