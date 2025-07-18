@@ -396,11 +396,11 @@ export default function Home() {
           // Anonymous user experience
           <div className="space-y-8">
             {/* Sign-up promotion card */}
-            <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
                   <div className="lg:col-span-2">
-                    <h2 className="text-2xl font-semibold mb-2">
+                    <h2 className="text-2xl font-semibold mb-2 text-foreground">
                       Search Any Domain's Content
                     </h2>
                     <p className="text-muted-foreground mb-4">
@@ -409,15 +409,15 @@ export default function Home() {
                     </p>
                     <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center space-x-2">
-                        <Search className="h-4 w-4" />
+                        <Search className="h-4 w-4 text-primary" />
                         <span>Free domain searches</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <History className="h-4 w-4" />
+                        <History className="h-4 w-4 text-primary" />
                         <span>Search history (sign-in required)</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Download className="h-4 w-4" />
+                        <Download className="h-4 w-4 text-primary" />
                         <span>CSV downloads (sign-in required)</span>
                       </div>
                     </div>
@@ -549,11 +549,11 @@ export default function Home() {
                 </div>
 
                 {/* Upgrade banner */}
-                <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-                  <Database className="h-4 w-4" />
+                <Alert className="border-primary/20 bg-card/50 backdrop-blur-sm">
+                  <Database className="h-4 w-4 text-primary" />
                   <AlertDescription>
                     <div className="flex items-center justify-between">
-                      <span>
+                      <span className="text-foreground">
                         <strong>Want to save these results?</strong> Sign in free to enable search history and CSV downloads.
                       </span>
                       <Button 
