@@ -20,6 +20,7 @@ The application follows a monorepo structure with a clear separation between cli
 - **UI Framework**: shadcn/ui components with Tailwind CSS
 - **State Management**: TanStack Query for server state
 - **Form Handling**: React Hook Form with Zod validation
+- **External Integrations**: Natural Brand Placement Scout (ChatGPT custom GPT)
 
 ## Key Components
 
@@ -48,8 +49,19 @@ The application follows a monorepo structure with a clear separation between cli
 4. Backend performs search using Serper.dev API
 5. For authenticated users: Results and search history are stored in database
 6. For anonymous users: Results are returned without persistence
-7. Search results displayed in responsive card layout
+7. Search results displayed in responsive card layout with copy functionality
 8. Premium features (CSV download, search history) require authentication
+9. Brand Placement Scout integration allows users to analyze results for marketing opportunities
+
+## Recent Changes
+
+### Brand Placement Scout Integration (July 18, 2025)
+- Added external integration with Natural Brand Placement Scout (ChatGPT custom GPT)
+- Implemented "Find Brand Placements" button in search results header
+- Added copy URL functionality to each search result with one-click copying
+- Created informational guides explaining how to use the brand placement tool
+- Enhanced UI with tooltips and visual indicators for the brand placement workflow
+- Feature available for both authenticated and anonymous users
 
 ## External Dependencies
 

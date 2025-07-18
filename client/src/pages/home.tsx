@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2, Download, History, User, LogOut, LogIn, Database } from "lucide-react";
+import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2, Download, History, User, LogOut, LogIn, Database, Zap, Target, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -77,6 +78,15 @@ export default function Home() {
     if (formData.domain && formData.keyword) {
       searchMutation.mutate(formData);
     }
+  };
+
+  const copyUrl = (url: string) => {
+    navigator.clipboard.writeText(url).then(() => {
+      toast({
+        title: "URL Copied",
+        description: "URL copied to clipboard. Paste it in the Brand Placement Scout to analyze!",
+      });
+    });
   };
 
   const downloadCSV = () => {
@@ -304,16 +314,50 @@ export default function Home() {
                         <span>{searchResults.length}</span> results found in <span>{searchTime}s</span>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={downloadCSV}
-                      className="flex items-center space-x-2"
-                    >
-                      <Download className="h-4 w-4" />
-                      <span>Download CSV</span>
-                    </Button>
+                    <div className="flex items-center space-x-3">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open('https://chatgpt.com/g/g-687a991a6b648191a27b5c3c4a7c40a8-natural-brand-placement-scout', '_blank')}
+                              className="flex items-center space-x-2 bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 hover:border-green-500/40 transition-all"
+                            >
+                              <Target className="h-4 w-4 text-green-500" />
+                              <span>Find Brand Placements</span>
+                              <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Analyze search results with AI to find natural brand placement opportunities</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadCSV}
+                        className="flex items-center space-x-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        <span>Download CSV</span>
+                      </Button>
+                    </div>
                   </div>
+
+                  {/* Brand Placement Guide */}
+                  <Alert className="border-green-500/20 bg-gradient-to-r from-green-500/5 to-blue-500/5">
+                    <Target className="h-4 w-4 text-green-500" />
+                    <AlertDescription>
+                      <div className="space-y-2">
+                        <p className="font-medium text-foreground">💡 Tip: Use the Brand Placement Scout</p>
+                        <p className="text-sm text-muted-foreground">
+                          Copy URLs from your search results and paste them into the Brand Placement Scout to discover natural placement opportunities for your brand or content.
+                        </p>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
 
                   {/* Results List */}
                   <div className="space-y-4">
@@ -321,11 +365,30 @@ export default function Home() {
                       <Card key={index} className="hover:border-primary/20 transition-all duration-200">
                         <CardContent className="p-6">
                           <div className="space-y-3">
-                            <h3 className="text-lg font-semibold hover:text-primary cursor-pointer transition-colors">
-                              <a href={result.url} target="_blank" rel="noopener noreferrer">
-                                {result.title}
-                              </a>
-                            </h3>
+                            <div className="flex items-start justify-between">
+                              <h3 className="text-lg font-semibold hover:text-primary cursor-pointer transition-colors flex-1">
+                                <a href={result.url} target="_blank" rel="noopener noreferrer">
+                                  {result.title}
+                                </a>
+                              </h3>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => copyUrl(result.url)}
+                                      className="ml-2 h-8 w-8 p-0 hover:bg-green-500/10"
+                                    >
+                                      <Copy className="h-4 w-4 text-green-500" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Copy URL for Brand Placement Scout</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
 
                             <a 
                               href={result.url} 
@@ -537,16 +600,50 @@ export default function Home() {
                       <span>{searchResults.length}</span> results found in <span>{searchTime}s</span>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={downloadCSV}
-                    className="flex items-center space-x-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Download CSV (Sign in required)</span>
-                  </Button>
+                  <div className="flex items-center space-x-3">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open('https://chatgpt.com/g/g-687a991a6b648191a27b5c3c4a7c40a8-natural-brand-placement-scout', '_blank')}
+                            className="flex items-center space-x-2 bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 hover:border-green-500/40 transition-all"
+                          >
+                            <Target className="h-4 w-4 text-green-500" />
+                            <span>Find Brand Placements</span>
+                            <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Analyze search results with AI to find natural brand placement opportunities</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={downloadCSV}
+                      className="flex items-center space-x-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span>Download CSV (Sign in required)</span>
+                    </Button>
+                  </div>
                 </div>
+
+                {/* Brand Placement Guide */}
+                <Alert className="border-green-500/20 bg-gradient-to-r from-green-500/5 to-blue-500/5">
+                  <Target className="h-4 w-4 text-green-500" />
+                  <AlertDescription>
+                    <div className="space-y-2">
+                      <p className="font-medium text-foreground">💡 Tip: Use the Brand Placement Scout</p>
+                      <p className="text-sm text-muted-foreground">
+                        Copy URLs from your search results and paste them into the Brand Placement Scout to discover natural placement opportunities for your brand or content.
+                      </p>
+                    </div>
+                  </AlertDescription>
+                </Alert>
 
                 {/* Upgrade banner */}
                 <Alert className="border-primary/20 bg-card/50 backdrop-blur-sm">
@@ -574,11 +671,30 @@ export default function Home() {
                     <Card key={index} className="hover:border-primary/20 transition-all duration-200">
                       <CardContent className="p-6">
                         <div className="space-y-3">
-                          <h3 className="text-lg font-semibold hover:text-primary cursor-pointer transition-colors">
-                            <a href={result.url} target="_blank" rel="noopener noreferrer">
-                              {result.title}
-                            </a>
-                          </h3>
+                          <div className="flex items-start justify-between">
+                            <h3 className="text-lg font-semibold hover:text-primary cursor-pointer transition-colors flex-1">
+                              <a href={result.url} target="_blank" rel="noopener noreferrer">
+                                {result.title}
+                              </a>
+                            </h3>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => copyUrl(result.url)}
+                                    className="ml-2 h-8 w-8 p-0 hover:bg-green-500/10"
+                                  >
+                                    <Copy className="h-4 w-4 text-green-500" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Copy URL for Brand Placement Scout</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
 
                           <a 
                             href={result.url} 
