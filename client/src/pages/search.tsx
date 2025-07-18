@@ -1,0 +1,345 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { searchQuerySchema, type SearchResult, type SearchQuery } from "@shared/schema";
+
+export default function SearchPage() {
+  const { toast } = useToast();
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchTime, setSearchTime] = useState<string>("");
+  const [currentQuery, setCurrentQuery] = useState<string>("");
+
+  const form = useForm<SearchQuery>({
+    resolver: zodResolver(searchQuerySchema),
+    defaultValues: {
+      domain: "",
+      keyword: "",
+    },
+  });
+
+  const searchMutation = useMutation({
+    mutationFn: async (data: SearchQuery) => {
+      const startTime = Date.now();
+      const response = await apiRequest("POST", "/api/search", data);
+      const results = await response.json();
+      const endTime = Date.now();
+      setSearchTime(((endTime - startTime) / 1000).toFixed(1));
+      return results;
+    },
+    onSuccess: (data) => {
+      setSearchResults(data);
+      setCurrentQuery(`site:${form.getValues("domain")} ${form.getValues("keyword")}`);
+      if (data.length === 0) {
+        toast({
+          title: "No Results Found",
+          description: "Try adjusting your keywords or checking the domain name.",
+        });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Search Failed",
+        description: error.message || "Unable to complete the search. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: SearchQuery) => {
+    searchMutation.mutate(data);
+  };
+
+  const retrySearch = () => {
+    const formData = form.getValues();
+    if (formData.domain && formData.keyword) {
+      searchMutation.mutate(formData);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border bg-background sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Search className="text-primary text-xl" />
+              <h1 className="text-xl font-semibold">Domain Search Tool</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-secondary">Powered by Google Search</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-6 py-8">
+        {/* Search Form */}
+        <Card className="mb-8 shadow-lg">
+          <CardContent className="p-8">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-semibold mb-2">Search Domain-Specific Content</h2>
+              <p className="text-secondary">Find content from specific domains using targeted Google searches</p>
+            </div>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="domain"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Domain</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              placeholder="example.com"
+                              className="pr-10 surface"
+                              {...field}
+                            />
+                            <Globe className="absolute right-3 top-3 h-4 w-4 text-secondary" />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Enter domain without protocol (e.g., github.com)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="keyword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Keywords</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              placeholder="react hooks tutorial"
+                              className="pr-10 surface"
+                              {...field}
+                            />
+                            <Search className="absolute right-3 top-3 h-4 w-4 text-secondary" />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Search terms to find within the domain
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="flex justify-center">
+                  <Button 
+                    type="submit" 
+                    className="px-8 py-3 font-medium flex items-center space-x-2"
+                    disabled={searchMutation.isPending}
+                  >
+                    {searchMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                    <span>{searchMutation.isPending ? "Searching..." : "Search Domain"}</span>
+                  </Button>
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-sm text-secondary">
+                    Query will be constructed as: <code className="surface px-2 py-1 rounded text-primary">site:[domain] [keywords]</code>
+                  </p>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+
+        {/* Loading State */}
+        {searchMutation.isPending && (
+          <div className="space-y-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-center space-x-3 py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="text-secondary">Searching domain content...</span>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Skeleton Loading Cards */}
+            <div className="space-y-4">
+              {[1, 2].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="h-6 surface rounded w-3/4"></div>
+                      <div className="h-4 surface rounded w-1/2"></div>
+                      <div className="h-4 surface rounded w-full"></div>
+                      <div className="h-4 surface rounded w-2/3"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {searchMutation.isError && !searchMutation.isPending && (
+          <Card className="border-red-500/20">
+            <CardContent className="p-8 text-center">
+              <div className="mb-4">
+                <AlertTriangle className="text-red-500 text-3xl mx-auto" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Search Failed</h3>
+              <p className="text-secondary mb-6">
+                Unable to complete the search. This could be due to rate limiting, network issues, or the domain being blocked.
+              </p>
+              <div className="space-x-3">
+                <Button onClick={retrySearch} className="px-6 py-3">
+                  <Search className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    form.reset();
+                    setSearchResults([]);
+                    setCurrentQuery("");
+                  }}
+                  className="px-6 py-3"
+                >
+                  Clear Search
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Empty State */}
+        {!searchMutation.isPending && !searchMutation.isError && searchResults.length === 0 && currentQuery && (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <div className="mb-4">
+                <Search className="text-secondary text-3xl mx-auto" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">No Results Found</h3>
+              <p className="text-secondary mb-6">
+                No content found for your search query. Try adjusting your keywords or checking the domain name.
+              </p>
+              <Button onClick={() => form.getValues("domain") && document.getElementById("domain")?.focus()}>
+                <Search className="h-4 w-4 mr-2" />
+                Try New Search
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Search Results */}
+        {searchResults.length > 0 && !searchMutation.isPending && (
+          <div className="space-y-6">
+            {/* Search Stats */}
+            <div className="flex items-center justify-between bg-card rounded-lg border border-border p-4">
+              <div className="flex items-center space-x-4">
+                <span className="text-secondary">Search results for:</span>
+                <code className="surface px-3 py-1 rounded text-primary text-sm">{currentQuery}</code>
+              </div>
+              <div className="text-sm text-secondary">
+                <span>{searchResults.length}</span> results found in <span>{searchTime}s</span>
+              </div>
+            </div>
+
+            {/* Results List */}
+            <div className="space-y-4">
+              {searchResults.map((result, index) => (
+                <Card key={index} className="hover:border-primary/50 transition-all duration-200 shadow-sm hover:shadow-md">
+                  <CardContent className="p-6">
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between">
+                        <h3 className="text-lg font-semibold hover:text-primary cursor-pointer transition-colors duration-200">
+                          <a href={result.url} target="_blank" rel="noopener noreferrer">
+                            {result.title}
+                          </a>
+                        </h3>
+                        <ExternalLink className="text-secondary text-sm mt-1 flex-shrink-0 ml-2" />
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 text-sm">
+                        <ExternalLink className="text-secondary h-4 w-4" />
+                        <a 
+                          href={result.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-secondary hover:text-green-400 transition-colors duration-200 truncate"
+                        >
+                          {result.url}
+                        </a>
+                      </div>
+                      
+                      <p className="text-secondary leading-relaxed">
+                        {result.snippet}
+                      </p>
+                      
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
+                        <div className="flex items-center space-x-4 text-xs text-secondary">
+                          <span><Clock className="h-3 w-3 inline mr-1" />Domain: {result.domain}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border bg-card mt-16">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h4 className="font-semibold mb-4">About</h4>
+              <p className="text-secondary text-sm leading-relaxed">
+                Domain Search Tool helps you find specific content within domains using Google's search capabilities with Puppeteer automation.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Features</h4>
+              <ul className="text-secondary text-sm space-y-2">
+                <li>✓ Domain-specific searches</li>
+                <li>✓ Automated result extraction</li>
+                <li>✓ Clean result formatting</li>
+                <li>✓ Error handling & retries</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Technology</h4>
+              <ul className="text-secondary text-sm space-y-2">
+                <li>🤖 Puppeteer headless browser</li>
+                <li>🔍 Google search integration</li>
+                <li>💻 Modern web technologies</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-border mt-8 pt-8 text-center text-secondary text-sm">
+            <p>&copy; 2024 Domain Search Tool. Built with modern web technologies.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
