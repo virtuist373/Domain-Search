@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2 } from "lucide-react";
+import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -61,6 +61,52 @@ export default function SearchPage() {
     const formData = form.getValues();
     if (formData.domain && formData.keyword) {
       searchMutation.mutate(formData);
+    }
+  };
+
+  const downloadCSV = () => {
+    if (searchResults.length === 0) return;
+
+    // Create CSV headers
+    const headers = ['Title', 'URL', 'Snippet', 'Domain', 'Keywords'];
+    
+    // Create CSV rows
+    const csvRows = searchResults.map(result => [
+      `"${result.title.replace(/"/g, '""')}"`, // Escape quotes in title
+      `"${result.url}"`,
+      `"${result.snippet.replace(/"/g, '""')}"`, // Escape quotes in snippet
+      `"${form.getValues('domain')}"`,
+      `"${form.getValues('keyword')}"`
+    ]);
+
+    // Combine headers and rows
+    const csvContent = [headers, ...csvRows]
+      .map(row => row.join(','))
+      .join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      
+      // Create filename with domain and timestamp
+      const timestamp = new Date().toISOString().slice(0, 16).replace(/:/g, '-');
+      const domain = form.getValues('domain');
+      const filename = `search-results-${domain}-${timestamp}.csv`;
+      
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "CSV Downloaded",
+        description: `Search results exported to ${filename}`,
+      });
     }
   };
 
@@ -249,10 +295,19 @@ export default function SearchPage() {
             <div className="flex items-center justify-between bg-card rounded-lg border border-border p-4">
               <div className="flex items-center space-x-4">
                 <span className="text-secondary">Search results</span>
+                <div className="text-sm text-secondary">
+                  <span>{searchResults.length}</span> results found in <span>{searchTime}s</span>
+                </div>
               </div>
-              <div className="text-sm text-secondary">
-                <span>{searchResults.length}</span> results found in <span>{searchTime}s</span>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={downloadCSV}
+                className="flex items-center space-x-2"
+              >
+                <Download className="h-4 w-4" />
+                <span>Download CSV</span>
+              </Button>
             </div>
 
             {/* Results List */}
