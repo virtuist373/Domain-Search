@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { searchQuerySchema } from "@shared/schema";
 import { ZodError } from "zod";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, optionalAuth } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth
@@ -21,34 +21,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search endpoint - updated to work with authenticated users
-  app.post("/api/search", isAuthenticated, async (req: any, res) => {
+  // Search endpoint - supports both authenticated and anonymous users
+  app.post("/api/search", optionalAuth, async (req: any, res) => {
     try {
       // Validate request body
       const { domain, keyword } = searchQuerySchema.parse(req.body);
       
-      // Get user ID from auth
-      const userId = req.user.claims.sub;
-      
       // Perform search using Serper API
       const results = await performSearch(domain, keyword);
       
-      // Create search history entry
-      const searchHist = await storage.createSearchHistory({
-        userId,
-        domain,
-        keyword,
-        resultsCount: results.length,
-      });
-      
-      // Store individual search results
-      for (const result of results) {
-        await storage.createSearchResult({
-          searchHistoryId: searchHist.id,
-          title: result.title,
-          url: result.url,
-          snippet: result.snippet,
-        });
+      // If user is authenticated, save search history
+      if (req.isAuthenticated() && req.user?.claims?.sub) {
+        const userId = req.user.claims.sub;
+        
+        try {
+          // Create search history entry
+          const searchHist = await storage.createSearchHistory({
+            userId,
+            domain,
+            keyword,
+            resultsCount: results.length,
+          });
+          
+          // Store individual search results
+          for (const result of results) {
+            await storage.createSearchResult({
+              searchHistoryId: searchHist.id,
+              title: result.title,
+              url: result.url,
+              snippet: result.snippet,
+            });
+          }
+        } catch (historyError) {
+          // Don't fail the search if history saving fails
+          console.error("Failed to save search history:", historyError);
+        }
       }
       
       res.json(results);

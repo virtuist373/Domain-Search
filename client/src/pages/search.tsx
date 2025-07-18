@@ -2,17 +2,21 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2, Download } from "lucide-react";
+import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2, Download, User, LogIn, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { searchQuerySchema, type SearchResult, type SearchQuery } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "wouter";
 
 export default function SearchPage() {
   const { toast } = useToast();
+  const { isAuthenticated, isAnonymous, user } = useAuth();
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchTime, setSearchTime] = useState<string>("");
   const [currentQuery, setCurrentQuery] = useState<string>("");
@@ -67,6 +71,16 @@ export default function SearchPage() {
   const downloadCSV = () => {
     if (searchResults.length === 0) return;
 
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign In Required",
+        description: "CSV download is available for signed-in users. Please sign in to download results.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Create CSV headers
     const headers = ['Title', 'URL', 'Snippet', 'Domain', 'Keywords'];
     
@@ -117,15 +131,67 @@ export default function SearchPage() {
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Search className="text-primary h-6 w-6" />
-              <h1 className="text-xl font-semibold">Domain Search</h1>
+              <Link href="/">
+                <Search className="text-primary h-6 w-6 cursor-pointer" />
+              </Link>
+              <Link href="/">
+                <h1 className="text-xl font-semibold cursor-pointer">Domain Search</h1>
+              </Link>
             </div>
 
+            <div className="flex items-center space-x-3">
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-muted-foreground">
+                    Welcome back, {user?.firstName || user?.email}
+                  </span>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.location.href = "/api/logout"}
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-muted-foreground">Anonymous User</span>
+                  <Button 
+                    size="sm"
+                    onClick={() => window.location.href = "/api/login"}
+                  >
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Sign In
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-8">
+        {/* Anonymous User Upgrade Banner */}
+        {isAnonymous && (
+          <Alert className="mb-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+            <History className="h-4 w-4" />
+            <AlertDescription>
+              <div className="flex items-center justify-between">
+                <span>
+                  <strong>Anonymous Search Mode</strong> - Search results won't be saved. 
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto text-blue-600 dark:text-blue-400"
+                    onClick={() => window.location.href = "/api/login"}
+                  >
+                    Sign in
+                  </Button> to unlock search history and CSV downloads.
+                </span>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Search Form */}
         <Card className="mb-8">
           <CardContent className="p-8">
@@ -306,7 +372,7 @@ export default function SearchPage() {
                 className="flex items-center space-x-2"
               >
                 <Download className="h-4 w-4" />
-                <span>Download CSV</span>
+                <span>{isAuthenticated ? "Download CSV" : "Download CSV (Sign in required)"}</span>
               </Button>
             </div>
 

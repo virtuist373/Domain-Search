@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a web scraping application built with React frontend, Express backend, and PostgreSQL database using Drizzle ORM. The application allows users to perform site-specific searches by entering a domain and keywords, then scrapes search results using Puppeteer. It features a modern dark-themed UI built with shadcn/ui components and Tailwind CSS.
+This is a web scraping application built with React frontend, Express backend, and PostgreSQL database using Drizzle ORM. The application allows both anonymous and authenticated users to perform site-specific searches using domain and keywords via the Serper.dev API. Anonymous users can perform searches freely, while authenticated users benefit from search history persistence and CSV download functionality. It features a modern dark-themed UI built with shadcn/ui components and Tailwind CSS.
 
 ## User Preferences
 
@@ -41,14 +41,14 @@ The application follows a monorepo structure with a clear separation between cli
 
 ## Data Flow
 
-1. User submits search form with domain and keywords
+1. User submits search form with domain and keywords (available for anonymous and authenticated users)
 2. Frontend validates input using Zod schema
-3. API request sent to `/api/search` endpoint
-4. Backend launches Puppeteer browser instance
-5. Automated search performed on specified domain
-6. Results extracted and stored in database
-7. Search results returned to frontend
-8. Results displayed in responsive card layout
+3. API request sent to `/api/search` endpoint with optional authentication
+4. Backend performs search using Serper.dev API
+5. For authenticated users: Results and search history are stored in database
+6. For anonymous users: Results are returned without persistence
+7. Search results displayed in responsive card layout
+8. Premium features (CSV download, search history) require authentication
 
 ## External Dependencies
 

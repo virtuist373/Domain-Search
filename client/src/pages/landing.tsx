@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Globe, History, Database } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Landing() {
   return (
@@ -31,15 +32,26 @@ export default function Landing() {
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Find specific content within any website using targeted Google searches. 
-            Save your search history and results for later review.
+            Try it free or sign in to save your search history and download results.
           </p>
-          <Button 
-            size="lg" 
-            onClick={() => window.location.href = "/api/login"}
-            className="px-8 py-3 text-lg"
-          >
-            Get Started
-          </Button>
+          <div className="space-x-4">
+            <Link href="/search">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="px-8 py-3 text-lg"
+              >
+                Try Free Search
+              </Button>
+            </Link>
+            <Button 
+              size="lg" 
+              onClick={() => window.location.href = "/api/login"}
+              className="px-8 py-3 text-lg"
+            >
+              Sign In
+            </Button>
+          </div>
         </div>
 
         {/* Features Grid */}
@@ -83,15 +95,26 @@ export default function Landing() {
                 Ready to Start Searching?
               </h2>
               <p className="text-muted-foreground mb-6">
-                Sign in to save your search history and access all features.
+                Try our search tool for free, or sign in to unlock search history and CSV downloads.
               </p>
-              <Button 
-                size="lg" 
-                onClick={() => window.location.href = "/api/login"}
-                className="px-8 py-3"
-              >
-                Sign In Now
-              </Button>
+              <div className="space-x-4">
+                <Link href="/search">
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="px-8 py-3"
+                  >
+                    Try Free Search
+                  </Button>
+                </Link>
+                <Button 
+                  size="lg" 
+                  onClick={() => window.location.href = "/api/login"}
+                  className="px-8 py-3"
+                >
+                  Sign In Now
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

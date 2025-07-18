@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
+import Search from "@/pages/search";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -13,13 +14,13 @@ function Router() {
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-        </>
-      )}
+      {/* Home page - different for authenticated vs anonymous users */}
+      <Route path="/" component={isAuthenticated ? Home : Landing} />
+      
+      {/* Search page - available for all users */}
+      <Route path="/search" component={Search} />
+      
+      {/* Default route */}
       <Route component={NotFound} />
     </Switch>
   );
