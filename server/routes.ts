@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { searchQuerySchema, advancedSearchQuerySchema } from "@shared/schema";
+import { searchQuerySchema, advancedSearchQuerySchema, insertSavedSearchSchema, updateSavedSearchSchema } from "@shared/schema";
 import type { SearchQuery, AdvancedSearchQuery } from "@shared/schema";
 import { ZodError } from "zod";
 import { setupAuth, isAuthenticated, optionalAuth } from "./replitAuth";
@@ -152,6 +152,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching search history:", error);
       res.status(500).json({ message: "Failed to fetch search history" });
+    }
+  });
+
+  // Saved searches endpoints
+  app.get("/api/saved-searches", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const savedSearches = await storage.getUserSavedSearches(userId);
+      res.json(savedSearches);
+    } catch (error) {
+      console.error("Error fetching saved searches:", error);
+      res.status(500).json({ message: "Failed to fetch saved searches" });
+    }
+  });
+
+  app.post("/api/saved-searches", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const savedSearchData = { ...req.body, userId };
+      
+      // Validate the saved search data
+      const validatedData = insertSavedSearchSchema.parse(savedSearchData);
+      
+      const savedSearch = await storage.createSavedSearch(validatedData);
+      res.status(201).json(savedSearch);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid saved search data",
+          errors: error.errors 
+        });
+      }
+      
+      console.error("Error creating saved search:", error);
+      res.status(500).json({ message: "Failed to create saved search" });
+    }
+  });
+
+  app.put("/api/saved-searches/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const searchId = parseInt(req.params.id);
+      
+      if (isNaN(searchId)) {
+        return res.status(400).json({ message: "Invalid search ID" });
+      }
+      
+      // Validate the update data
+      const validatedData = updateSavedSearchSchema.parse(req.body);
+      
+      const updatedSearch = await storage.updateSavedSearch(searchId, userId, validatedData);
+      res.json(updatedSearch);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid saved search data",
+          errors: error.errors 
+        });
+      }
+      
+      console.error("Error updating saved search:", error);
+      res.status(500).json({ message: "Failed to update saved search" });
+    }
+  });
+
+  app.delete("/api/saved-searches/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const searchId = parseInt(req.params.id);
+      
+      if (isNaN(searchId)) {
+        return res.status(400).json({ message: "Invalid search ID" });
+      }
+      
+      await storage.deleteSavedSearch(searchId, userId);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting saved search:", error);
+      res.status(500).json({ message: "Failed to delete saved search" });
+    }
+  });
+
+  app.get("/api/saved-searches/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const searchId = parseInt(req.params.id);
+      
+      if (isNaN(searchId)) {
+        return res.status(400).json({ message: "Invalid search ID" });
+      }
+      
+      const savedSearch = await storage.getSavedSearch(searchId, userId);
+      
+      if (!savedSearch) {
+        return res.status(404).json({ message: "Saved search not found" });
+      }
+      
+      res.json(savedSearch);
+    } catch (error) {
+      console.error("Error fetching saved search:", error);
+      res.status(500).json({ message: "Failed to fetch saved search" });
     }
   });
 

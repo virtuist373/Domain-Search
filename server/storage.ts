@@ -2,13 +2,17 @@ import {
   users, 
   searchResults, 
   searchHistory,
+  savedSearches,
   type User, 
   type UpsertUser, 
   type SearchResult, 
   type InsertSearchResult,
   type SearchHistory,
   type InsertSearchHistory,
-  type SearchHistoryWithResults
+  type SearchHistoryWithResults,
+  type SavedSearch,
+  type InsertSavedSearch,
+  type UpdateSavedSearch
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -25,6 +29,13 @@ export interface IStorage {
   // Search results operations
   createSearchResult(result: InsertSearchResult): Promise<SearchResult>;
   getSearchResults(searchHistoryId: number): Promise<SearchResult[]>;
+  
+  // Saved searches operations
+  createSavedSearch(savedSearch: InsertSavedSearch): Promise<SavedSearch>;
+  getUserSavedSearches(userId: string): Promise<SavedSearch[]>;
+  updateSavedSearch(id: number, userId: string, updates: UpdateSavedSearch): Promise<SavedSearch>;
+  deleteSavedSearch(id: number, userId: string): Promise<void>;
+  getSavedSearch(id: number, userId: string): Promise<SavedSearch | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -84,6 +95,49 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(searchResults)
       .where(eq(searchResults.searchHistoryId, searchHistoryId));
+  }
+
+  // Saved searches operations
+  async createSavedSearch(savedSearch: InsertSavedSearch): Promise<SavedSearch> {
+    const [newSavedSearch] = await db
+      .insert(savedSearches)
+      .values(savedSearch)
+      .returning();
+    return newSavedSearch;
+  }
+
+  async getUserSavedSearches(userId: string): Promise<SavedSearch[]> {
+    return await db
+      .select()
+      .from(savedSearches)
+      .where(eq(savedSearches.userId, userId))
+      .orderBy(desc(savedSearches.createdAt));
+  }
+
+  async updateSavedSearch(id: number, userId: string, updates: UpdateSavedSearch): Promise<SavedSearch> {
+    const [updatedSearch] = await db
+      .update(savedSearches)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(savedSearches.id, id), eq(savedSearches.userId, userId)))
+      .returning();
+    return updatedSearch;
+  }
+
+  async deleteSavedSearch(id: number, userId: string): Promise<void> {
+    await db
+      .delete(savedSearches)
+      .where(and(eq(savedSearches.id, id), eq(savedSearches.userId, userId)));
+  }
+
+  async getSavedSearch(id: number, userId: string): Promise<SavedSearch | undefined> {
+    const [savedSearch] = await db
+      .select()
+      .from(savedSearches)
+      .where(and(eq(savedSearches.id, id), eq(savedSearches.userId, userId)));
+    return savedSearch;
   }
 }
 

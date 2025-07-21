@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDown, ChevronUp, Globe, Search, Plus, Minus, Quote, Filter, Calendar, FileText, Languages, MapPin } from "lucide-react";
@@ -14,9 +14,11 @@ import { advancedSearchQuerySchema, type AdvancedSearchQuery } from "@shared/sch
 interface AdvancedSearchFormProps {
   onSubmit: (data: AdvancedSearchQuery) => void;
   isLoading: boolean;
+  loadedSearchData?: AdvancedSearchQuery;
+  onFormDataChange?: (data: AdvancedSearchQuery) => void;
 }
 
-export default function AdvancedSearchForm({ onSubmit, isLoading }: AdvancedSearchFormProps) {
+export default function AdvancedSearchForm({ onSubmit, isLoading, loadedSearchData, onFormDataChange }: AdvancedSearchFormProps) {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
   const form = useForm<AdvancedSearchQuery>({
@@ -34,6 +36,22 @@ export default function AdvancedSearchForm({ onSubmit, isLoading }: AdvancedSear
       region: "us",
     },
   });
+
+  // Load search data when provided
+  React.useEffect(() => {
+    if (loadedSearchData) {
+      form.reset(loadedSearchData);
+      setIsAdvancedOpen(true); // Open advanced options when loading saved search
+    }
+  }, [loadedSearchData, form]);
+
+  // Notify parent when form data changes
+  const formData = form.watch();
+  React.useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange(formData);
+    }
+  }, [formData, onFormDataChange]);
 
   const handleSubmit = (data: AdvancedSearchQuery) => {
     // Clean up empty fields

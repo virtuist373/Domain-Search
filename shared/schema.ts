@@ -45,9 +45,29 @@ export const searchResults = pgTable("search_results", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Saved searches table for user's favorite search configurations
+export const savedSearches = pgTable("saved_searches", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name").notNull(),
+  domain: text("domain").notNull(),
+  includeTerms: text("include_terms"),
+  excludeTerms: text("exclude_terms"),
+  exactPhrase: text("exact_phrase"),
+  anyOfTerms: text("any_of_terms"),
+  allOfTerms: text("all_of_terms"),
+  fileType: text("file_type"),
+  dateRange: varchar("date_range").default("any"),
+  language: text("language"),
+  region: varchar("region").default("us"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   searchHistory: many(searchHistory),
+  savedSearches: many(savedSearches),
 }));
 
 export const searchHistoryRelations = relations(searchHistory, ({ one, many }) => ({
@@ -62,6 +82,13 @@ export const searchResultsRelations = relations(searchResults, ({ one }) => ({
   searchHistory: one(searchHistory, {
     fields: [searchResults.searchHistoryId],
     references: [searchHistory.id],
+  }),
+}));
+
+export const savedSearchesRelations = relations(savedSearches, ({ one }) => ({
+  user: one(users, {
+    fields: [savedSearches.userId],
+    references: [users.id],
   }),
 }));
 
@@ -81,6 +108,21 @@ export const insertSearchHistorySchema = createInsertSchema(searchHistory).omit(
 export const insertSearchResultSchema = createInsertSchema(searchResults).omit({
   id: true,
   createdAt: true,
+});
+
+// Schema for inserting saved searches
+export const insertSavedSearchSchema = createInsertSchema(savedSearches).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Schema for updating saved searches
+export const updateSavedSearchSchema = createInsertSchema(savedSearches).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 // Schema for basic search queries from frontend
@@ -116,6 +158,9 @@ export type InsertSearchHistory = z.infer<typeof insertSearchHistorySchema>;
 export type SearchHistory = typeof searchHistory.$inferSelect;
 export type InsertSearchResult = z.infer<typeof insertSearchResultSchema>;
 export type SearchResult = typeof searchResults.$inferSelect;
+export type InsertSavedSearch = z.infer<typeof insertSavedSearchSchema>;
+export type UpdateSavedSearch = z.infer<typeof updateSavedSearchSchema>;
+export type SavedSearch = typeof savedSearches.$inferSelect;
 export type SearchQuery = z.infer<typeof searchQuerySchema>;
 export type AdvancedSearchQuery = z.infer<typeof advancedSearchQuerySchema>;
 

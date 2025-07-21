@@ -16,6 +16,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { useAuth } from "@/hooks/useAuth";
 import { searchQuerySchema, type SearchResult, type SearchQuery, type SearchHistoryWithResults, type AdvancedSearchQuery } from "@shared/schema";
 import AdvancedSearchForm from "@/components/AdvancedSearchForm";
+import SavedSearches from "@/components/SavedSearches";
 
 export default function Home() {
   const { toast } = useToast();
@@ -24,6 +25,8 @@ export default function Home() {
   const [searchTime, setSearchTime] = useState<string>("");
   const [currentQuery, setCurrentQuery] = useState<string>("");
   const [queryInfo, setQueryInfo] = useState<any>(null);
+  const [loadedSearchData, setLoadedSearchData] = useState<AdvancedSearchQuery | undefined>();
+  const [currentFormData, setCurrentFormData] = useState<AdvancedSearchQuery | undefined>();
 
   const form = useForm<SearchQuery>({
     resolver: zodResolver(searchQuerySchema),
@@ -115,6 +118,19 @@ export default function Home() {
 
   const onAdvancedSubmit = (data: AdvancedSearchQuery) => {
     advancedSearchMutation.mutate(data);
+  };
+
+  const handleLoadSavedSearch = (searchData: AdvancedSearchQuery) => {
+    setLoadedSearchData(searchData);
+    setCurrentFormData(searchData);
+    toast({
+      title: "Search Loaded",
+      description: "Saved search has been loaded into the form.",
+    });
+  };
+
+  const handleFormDataChange = (data: AdvancedSearchQuery) => {
+    setCurrentFormData(data);
   };
 
   const retrySearch = () => {
@@ -457,10 +473,20 @@ export default function Home() {
             </TabsContent>
 
             <TabsContent value="advanced" className="space-y-6">
+              {/* Saved Searches (only for authenticated users) */}
+              {isAuthenticated && (
+                <SavedSearches 
+                  onLoadSearch={handleLoadSavedSearch}
+                  currentSearch={currentFormData}
+                />
+              )}
+
               {/* Advanced Search Form */}
               <AdvancedSearchForm 
                 onSubmit={onAdvancedSubmit}
                 isLoading={advancedSearchMutation.isPending}
+                loadedSearchData={loadedSearchData}
+                onFormDataChange={handleFormDataChange}
               />
 
               {/* Advanced Search Results */}
