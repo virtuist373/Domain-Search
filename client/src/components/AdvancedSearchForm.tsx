@@ -252,7 +252,7 @@ export default function AdvancedSearchForm({ onSubmit, isLoading }: AdvancedSear
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="">Any file type</SelectItem>
+                              <SelectItem value="any">Any file type</SelectItem>
                               <SelectItem value="pdf">PDF</SelectItem>
                               <SelectItem value="doc">DOC</SelectItem>
                               <SelectItem value="docx">DOCX</SelectItem>

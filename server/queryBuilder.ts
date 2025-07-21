@@ -78,7 +78,7 @@ export function buildAdvancedQuery(searchParams: AdvancedSearchQuery): SearchQue
   }
 
   // File type restriction
-  if (searchParams.fileType?.trim()) {
+  if (searchParams.fileType?.trim() && searchParams.fileType.trim() !== 'any') {
     queryParts.push(`filetype:${searchParams.fileType.trim()}`);
     operators.push(`FILETYPE: ${searchParams.fileType}`);
     descriptions.push(`file type: ${searchParams.fileType}`);
