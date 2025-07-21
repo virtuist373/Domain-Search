@@ -27,6 +27,7 @@ export default function Home() {
   const [queryInfo, setQueryInfo] = useState<any>(null);
   const [loadedSearchData, setLoadedSearchData] = useState<AdvancedSearchQuery | undefined>();
   const [currentFormData, setCurrentFormData] = useState<AdvancedSearchQuery | undefined>();
+  const [activeTab, setActiveTab] = useState<string>("search");
 
   const form = useForm<SearchQuery>({
     resolver: zodResolver(searchQuerySchema),
@@ -210,6 +211,15 @@ export default function Home() {
     form.setValue("keyword", historyItem.keyword);
     setSearchResults(historyItem.results);
     setCurrentQuery(`site:${historyItem.domain} ${historyItem.keyword}`);
+    setQueryInfo(null); // Clear advanced query info for basic search
+    
+    // Switch to search tab to show the results
+    setActiveTab("search");
+    
+    toast({
+      title: "Search History Loaded",
+      description: `Loaded ${historyItem.results.length} results from ${historyItem.domain}`,
+    });
   };
 
   // Show loading state while checking authentication
@@ -264,7 +274,7 @@ export default function Home() {
       <main className="max-w-6xl mx-auto px-6 py-8">
         {isAuthenticated ? (
           // Authenticated user experience with tabs
-          <Tabs defaultValue="search" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="search">Basic Search</TabsTrigger>
               <TabsTrigger value="advanced">Advanced Search</TabsTrigger>
@@ -646,18 +656,23 @@ export default function Home() {
                   ) : searchHistory && searchHistory.length > 0 ? (
                     <div className="space-y-4">
                       {searchHistory.map((item) => (
-                        <Card key={item.id} className="hover:border-primary/20 transition-colors cursor-pointer" onClick={() => loadHistorySearch(item)}>
+                        <Card key={item.id} className="hover:border-primary/20 hover:bg-accent/50 transition-all cursor-pointer group" onClick={() => loadHistorySearch(item)}>
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between">
-                              <div className="space-y-1">
-                                <p className="font-medium">
+                              <div className="space-y-1 flex-1">
+                                <p className="font-medium group-hover:text-primary transition-colors">
                                   site:{item.domain} {item.keyword}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
                                   {item.resultsCount} results • {new Date(item.createdAt!).toLocaleDateString()}
                                 </p>
                               </div>
-                              <Search className="h-4 w-4 text-muted-foreground" />
+                              <div className="flex items-center space-x-2">
+                                <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Click to view
+                                </span>
+                                <Search className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                              </div>
                             </div>
                           </CardContent>
                         </Card>
