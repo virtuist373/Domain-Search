@@ -83,13 +83,30 @@ export const insertSearchResultSchema = createInsertSchema(searchResults).omit({
   createdAt: true,
 });
 
-// Schema for search queries from frontend
+// Schema for basic search queries from frontend
 export const searchQuerySchema = z.object({
   domain: z.string().min(1, "Domain is required").refine((val) => {
     // Basic domain validation - no protocol, valid format
     return /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.([a-zA-Z]{2,}|[a-zA-Z]{2,}\.[a-zA-Z]{2,})$/.test(val);
   }, "Please enter a valid domain (e.g., example.com)"),
   keyword: z.string().min(1, "Keywords are required").max(200, "Keywords too long"),
+});
+
+// Schema for advanced search queries with operators
+export const advancedSearchQuerySchema = z.object({
+  domain: z.string().min(1, "Domain is required").refine((val) => {
+    // Basic domain validation - no protocol, valid format
+    return /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.([a-zA-Z]{2,}|[a-zA-Z]{2,}\.[a-zA-Z]{2,})$/.test(val);
+  }, "Please enter a valid domain (e.g., example.com)"),
+  includeTerms: z.string().optional(),
+  excludeTerms: z.string().optional(),
+  exactPhrase: z.string().optional(),
+  anyOfTerms: z.string().optional(),
+  allOfTerms: z.string().optional(),
+  fileType: z.string().optional(),
+  dateRange: z.enum(["any", "day", "week", "month", "year"]).optional().default("any"),
+  language: z.string().optional(),
+  region: z.string().optional().default("us"),
 });
 
 // Type exports
@@ -100,6 +117,7 @@ export type SearchHistory = typeof searchHistory.$inferSelect;
 export type InsertSearchResult = z.infer<typeof insertSearchResultSchema>;
 export type SearchResult = typeof searchResults.$inferSelect;
 export type SearchQuery = z.infer<typeof searchQuerySchema>;
+export type AdvancedSearchQuery = z.infer<typeof advancedSearchQuerySchema>;
 
 // Extended types for frontend
 export type SearchHistoryWithResults = SearchHistory & {

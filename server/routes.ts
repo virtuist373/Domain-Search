@@ -1,9 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { searchQuerySchema } from "@shared/schema";
+import { searchQuerySchema, advancedSearchQuerySchema } from "@shared/schema";
+import type { SearchQuery, AdvancedSearchQuery } from "@shared/schema";
 import { ZodError } from "zod";
 import { setupAuth, isAuthenticated, optionalAuth } from "./replitAuth";
+import { buildBasicQuery, buildAdvancedQuery, getDateFilterParams, getLocalizationParams } from "./queryBuilder";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth
@@ -74,6 +76,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Advanced search endpoint - supports both authenticated and anonymous users
+  app.post("/api/search/advanced", optionalAuth, async (req: any, res) => {
+    try {
+      // Validate request body
+      const searchParams = advancedSearchQuerySchema.parse(req.body);
+      
+      // Build advanced query
+      const queryComponents = buildAdvancedQuery(searchParams);
+      
+      // Get additional search parameters
+      const dateParams = getDateFilterParams(searchParams.dateRange);
+      const localizationParams = getLocalizationParams(searchParams.language, searchParams.region);
+      
+      // Perform search using Serper API
+      const results = await performAdvancedSearch(queryComponents, { ...dateParams, ...localizationParams });
+      
+      // If user is authenticated, save search history
+      if (req.isAuthenticated() && req.user?.claims?.sub) {
+        const userId = req.user.claims.sub;
+        
+        try {
+          // Create search history entry with combined description
+          const searchHist = await storage.createSearchHistory({
+            userId,
+            domain: searchParams.domain,
+            keyword: queryComponents.description,
+            resultsCount: results.length,
+          });
+          
+          // Store individual search results
+          for (const result of results) {
+            await storage.createSearchResult({
+              searchHistoryId: searchHist.id,
+              title: result.title,
+              url: result.url,
+              snippet: result.snippet,
+            });
+          }
+        } catch (historyError) {
+          // Don't fail the search if history saving fails
+          console.error("Failed to save search history:", historyError);
+        }
+      }
+      
+      res.json({
+        results,
+        queryInfo: {
+          query: queryComponents.query,
+          operators: queryComponents.operators,
+          description: queryComponents.description
+        }
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid advanced search parameters",
+          errors: error.errors 
+        });
+      }
+      
+      console.error("Advanced search error:", error);
+      res.status(500).json({ 
+        message: "Advanced search failed. Please try again later."
+      });
+    }
+  });
+
   // Search history endpoint
   app.get("/api/search-history", isAuthenticated, async (req: any, res) => {
     try {
@@ -137,5 +206,54 @@ async function performSearch(domain: string, keyword: string) {
   } catch (error) {
     console.error("Serper search error:", error);
     throw new Error("Failed to perform search. Please try again.");
+  }
+}
+
+async function performAdvancedSearch(queryComponents: any, extraParams: any = {}) {
+  const apiKey = process.env.SERPER_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("SERPER_API_KEY is not configured");
+  }
+
+  try {
+    console.log(`Advanced searching with Serper.dev: ${queryComponents.query}`);
+    console.log(`Query operators: ${queryComponents.operators.join(', ')}`);
+    
+    const searchParams = {
+      q: queryComponents.query,
+      num: 10,
+      ...extraParams
+    };
+    
+    const response = await fetch('https://google.serper.dev/search', {
+      method: 'POST',
+      headers: {
+        'X-API-KEY': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(searchParams),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Serper API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    // Transform Serper results to match our expected format
+    const results = data.organic?.map((result: any) => ({
+      title: result.title || 'No title',
+      url: result.link || '',
+      snippet: result.snippet || 'No snippet available'
+    })) || [];
+    
+    console.log(`Found ${results.length} results from advanced search`);
+    
+    return results;
+    
+  } catch (error) {
+    console.error("Advanced search error:", error);
+    throw new Error("Failed to perform advanced search. Please try again.");
   }
 }

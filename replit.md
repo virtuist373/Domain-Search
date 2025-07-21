@@ -55,6 +55,15 @@ The application follows a monorepo structure with a clear separation between cli
 
 ## Recent Changes
 
+### Advanced Search Query Logic Implementation (July 21, 2025)
+- ✓ Enhanced schema to support advanced search operators (include, exclude, AND, OR, exact phrase, file type, date range)
+- ✓ Created comprehensive query builder utility with Google search operator support
+- ✓ Added advanced search API endpoint with query information response
+- ✓ Implemented advanced search form component with collapsible options
+- ✓ Updated UI to include both basic and advanced search tabs for authenticated and anonymous users
+- ✓ Added query information display showing generated query, operators, and search description
+- ✓ Integrated advanced search functionality with existing authentication and history system
+
 ### Brand Placement Scout Integration (July 18, 2025)
 - Added external integration with Natural Brand Placement Scout (ChatGPT custom GPT)
 - Implemented "Find Brand Placements" button in search results header
