@@ -1206,7 +1206,7 @@ export default function Home() {
                     </p>
                     <div className="bg-muted p-3 rounded-md space-y-2">
                       <p className="text-sm font-medium">✓ Basic Search</p>
-                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">competitor.com</code></p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">publisher.com</code></p>
                       <p className="text-xs text-muted-foreground">Keywords: <code className="bg-background px-1 rounded">marketing automation CRM</code></p>
                     </div>
                   </div>
@@ -1255,7 +1255,7 @@ export default function Home() {
                       <p className="text-sm font-medium">✓ Advanced Search</p>
                       <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">review-site.com</code></p>
                       <p className="text-xs text-muted-foreground">All of these words: <code className="bg-background px-1 rounded">Slack</code></p>
-                      <p className="text-xs text-muted-foreground">Exclude these words: <code className="bg-background px-1 rounded">Microsoft Teams</code></p>
+                      <p className="text-xs text-muted-foreground">Exclude these words: <code className="bg-background px-1 rounded">"Microsoft Teams"</code></p>
                     </div>
                   </div>
                 </CardContent>
