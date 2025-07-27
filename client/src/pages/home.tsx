@@ -1456,7 +1456,7 @@ export default function Home() {
               </a>
               {' '}with{' '}
               <a 
-                href="https://replit.com" 
+                href="https://replit.com/refer/lunaris-tanner" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-muted-foreground/80 hover:text-muted-foreground transition-colors"
