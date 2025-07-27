@@ -1147,18 +1147,34 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-6 py-2 text-center">
-          <p className="text-xs text-muted-foreground/60">
-            Made by{' '}
-            <a 
-              href="https://tannerbraden.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-muted-foreground/80 hover:text-muted-foreground transition-colors"
-            >
-              Tanner Braden
-            </a>
-          </p>
+        <div className="max-w-6xl mx-auto px-6 py-2">
+          <div className="flex items-center justify-center space-x-2">
+            <p className="text-xs text-muted-foreground/60">
+              Made by{' '}
+              <a 
+                href="https://tannerbraden.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground/80 hover:text-muted-foreground transition-colors"
+              >
+                Tanner Braden
+              </a>
+              {' '}with{' '}
+              <a 
+                href="https://replit.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground/80 hover:text-muted-foreground transition-colors"
+              >
+                Replit
+              </a>
+            </p>
+            <img 
+              src="/replit.png" 
+              alt="Replit" 
+              className="h-4 w-4 opacity-60"
+            />
+          </div>
         </div>
       </footer>
     </div>
