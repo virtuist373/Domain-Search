@@ -2,12 +2,22 @@
 
 ## Overview
 
-This is a web scraping application built with React frontend, Express backend, and PostgreSQL database using Drizzle ORM. The application allows both anonymous and authenticated users to perform site-specific searches using domain and keywords via the Serper.dev API. Anonymous users can perform searches freely, while authenticated users benefit from search history persistence and CSV download functionality. It features a modern dark-themed UI built with shadcn/ui components and Tailwind CSS.
+SiteSearch is a web scraping application built with React frontend, Express backend, and PostgreSQL database using Drizzle ORM. The application allows both anonymous and authenticated users to perform site-specific searches using domain and keywords via the Serper.dev API. Anonymous users can perform searches freely, while authenticated users benefit from search history persistence and CSV download functionality. It features a modern dark-themed UI built with shadcn/ui components and Tailwind CSS.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 App architecture: Single-page application without routing flashes.
+
+## Recent Changes
+
+### App Rebranding to "SiteSearch" (July 27, 2025)
+✓ Updated app name from "Domain Search" to "SiteSearch" throughout the application
+✓ Added comprehensive favicon metadata to client/index.html with all icon sizes
+✓ Updated navbar header to use SiteSearch icon and name
+✓ Updated page title and meta descriptions for SEO
+✓ Added Open Graph and Twitter social media meta tags
+✓ Updated all user-facing copy and documentation
 
 ## System Architecture
 

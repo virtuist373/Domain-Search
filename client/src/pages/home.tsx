@@ -238,8 +238,8 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Search className="text-primary h-6 w-6" />
-              <h1 className="text-xl font-semibold">Domain Search</h1>
+              <img src="/favicon-32x32.png" alt="SiteSearch" className="h-6 w-6" />
+              <h1 className="text-xl font-semibold">SiteSearch</h1>
             </div>
 
             <div className="flex items-center space-x-3">
@@ -965,7 +965,7 @@ export default function Home() {
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
                     <div className="lg:col-span-2">
                       <h2 className="text-2xl font-semibold mb-2 text-foreground">
-                        Advanced Domain Search
+                        Advanced SiteSearch
                       </h2>
                       <p className="text-muted-foreground mb-4">
                         Use powerful search operators like AND, OR, exact phrases, and exclude terms. 
@@ -1150,9 +1150,9 @@ export default function Home() {
         <div className="space-y-12">
           {/* Introduction */}
           <div className="text-center space-y-4">
-            <h2 className="text-3xl font-bold text-foreground">How to Use Domain Search</h2>
+            <h2 className="text-3xl font-bold text-foreground">How to Use SiteSearch</h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Domain Search helps you find specific content within any website. Perfect for competitive research, 
+              SiteSearch helps you find specific content within any website. Perfect for competitive research, 
               link building opportunities, content gap analysis, and brand monitoring.
             </p>
           </div>
