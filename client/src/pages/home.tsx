@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2, Download, History, User, LogOut, LogIn, Database, Zap, Target, Copy, Settings } from "lucide-react";
+import { Search, Globe, ExternalLink, Clock, AlertTriangle, Loader2, Download, History, User, LogOut, LogIn, Database, Zap, Target, Copy, Settings, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1144,6 +1144,301 @@ export default function Home() {
           </Tabs>
         )}
       </main>
+
+      {/* How to Guide Section */}
+      <section className="max-w-6xl mx-auto px-6 py-16 bg-accent/20">
+        <div className="space-y-12">
+          {/* Introduction */}
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl font-bold text-foreground">How to Use Domain Search</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Domain Search helps you find specific content within any website. Perfect for competitive research, 
+              link building opportunities, content gap analysis, and brand monitoring.
+            </p>
+          </div>
+
+          {/* Quick Start */}
+          <Card className="border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Zap className="h-5 w-5 text-primary" />
+                <span>Quick Start</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">Basic Search</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Use Basic Search for simple keyword searches within a specific domain. 
+                    Perfect for finding mentions, topics, or content themes.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">Advanced Search</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Use Advanced Search for complex queries with AND/OR operators, exact phrases, 
+                    exclusions, and file type filtering.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* FAQ Section */}
+          <div className="space-y-8">
+            <h3 className="text-2xl font-semibold text-center text-foreground">Common Use Cases & Examples</h3>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Link Building & Outreach */}
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <ExternalLink className="h-5 w-5 text-blue-500" />
+                    <span>Link Building & Outreach</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground">Find link insertion opportunities</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      "Does [domain] have any pages that would be relevant to [my brand] and a good fit for a link insertion?"
+                    </p>
+                    <div className="bg-muted p-3 rounded-md space-y-2">
+                      <p className="text-sm font-medium">✓ Basic Search</p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">competitor.com</code></p>
+                      <p className="text-xs text-muted-foreground">Keywords: <code className="bg-background px-1 rounded">marketing automation CRM</code></p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground">Find guest posting opportunities</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Look for sites that accept guest contributors in your niche.
+                    </p>
+                    <div className="bg-muted p-3 rounded-md space-y-2">
+                      <p className="text-sm font-medium">✓ Basic Search</p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">industry-blog.com</code></p>
+                      <p className="text-xs text-muted-foreground">Keywords: <code className="bg-background px-1 rounded">guest post contribute author</code></p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Competitive Research */}
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <Target className="h-5 w-5 text-green-500" />
+                    <span>Competitive Research</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground">Find competitor mentions</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      "Does [domain] mention [competitor brand] on any of their pages?"
+                    </p>
+                    <div className="bg-muted p-3 rounded-md space-y-2">
+                      <p className="text-sm font-medium">✓ Basic Search</p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">industry-site.com</code></p>
+                      <p className="text-xs text-muted-foreground">Keywords: <code className="bg-background px-1 rounded">HubSpot Salesforce</code></p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground">Find content gaps</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      "Does [domain] have pages mentioning [competitor] but not [my brand]?"
+                    </p>
+                    <div className="bg-muted p-3 rounded-md space-y-2">
+                      <p className="text-sm font-medium">✓ Advanced Search</p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">review-site.com</code></p>
+                      <p className="text-xs text-muted-foreground">All of these words: <code className="bg-background px-1 rounded">Slack</code></p>
+                      <p className="text-xs text-muted-foreground">Exclude these words: <code className="bg-background px-1 rounded">Microsoft Teams</code></p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Brand Monitoring */}
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <Search className="h-5 w-5 text-purple-500" />
+                    <span>Brand Monitoring</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground">Monitor brand mentions</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Track what others are saying about your brand across specific domains.
+                    </p>
+                    <div className="bg-muted p-3 rounded-md space-y-2">
+                      <p className="text-sm font-medium">✓ Basic Search</p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">reddit.com</code></p>
+                      <p className="text-xs text-muted-foreground">Keywords: <code className="bg-background px-1 rounded">"YourBrand" review experience</code></p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground">Find product comparisons</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Discover how your product is being compared to competitors.
+                    </p>
+                    <div className="bg-muted p-3 rounded-md space-y-2">
+                      <p className="text-sm font-medium">✓ Advanced Search</p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">comparison-site.com</code></p>
+                      <p className="text-xs text-muted-foreground">Any of these words: <code className="bg-background px-1 rounded">vs versus compared comparison</code></p>
+                      <p className="text-xs text-muted-foreground">All of these words: <code className="bg-background px-1 rounded">YourBrand</code></p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Content Research */}
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <FileText className="h-5 w-5 text-orange-500" />
+                    <span>Content Research</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground">Find content templates</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Discover how successful sites structure their content around specific topics.
+                    </p>
+                    <div className="bg-muted p-3 rounded-md space-y-2">
+                      <p className="text-sm font-medium">✓ Advanced Search</p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">successful-blog.com</code></p>
+                      <p className="text-xs text-muted-foreground">Exact phrase: <code className="bg-background px-1 rounded">"ultimate guide to"</code></p>
+                      <p className="text-xs text-muted-foreground">Any of these words: <code className="bg-background px-1 rounded">SEO marketing strategy</code></p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-foreground">Find resource pages</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Locate resource and tools pages for potential link opportunities.
+                    </p>
+                    <div className="bg-muted p-3 rounded-md space-y-2">
+                      <p className="text-sm font-medium">✓ Basic Search</p>
+                      <p className="text-xs text-muted-foreground">Domain: <code className="bg-background px-1 rounded">authority-site.com</code></p>
+                      <p className="text-xs text-muted-foreground">Keywords: <code className="bg-background px-1 rounded">resources tools recommended links</code></p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Advanced Search Operators Guide */}
+          <Card className="border-blue-500/20 bg-gradient-to-r from-blue-500/5 to-purple-500/5">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Settings className="h-5 w-5 text-blue-500" />
+                <span>Advanced Search Operators Guide</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">All of these words</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Find pages containing ALL specified terms (AND operator)
+                    </p>
+                    <code className="text-xs bg-background p-1 rounded block">marketing automation CRM</code>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Any of these words</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Find pages containing ANY of the specified terms (OR operator)
+                    </p>
+                    <code className="text-xs bg-background p-1 rounded block">tutorial guide walkthrough</code>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Exact phrase</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Find pages containing the exact phrase in quotes
+                    </p>
+                    <code className="text-xs bg-background p-1 rounded block">"best practices for SEO"</code>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Exclude these words</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Remove pages containing specified terms (NOT operator)
+                    </p>
+                    <code className="text-xs bg-background p-1 rounded block">pricing free trial</code>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">File type</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Search for specific file types (PDF, DOC, etc.)
+                    </p>
+                    <code className="text-xs bg-background p-1 rounded block">pdf</code>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">Date range</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Filter results by publication date
+                    </p>
+                    <code className="text-xs bg-background p-1 rounded block">Past month, week, year</code>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pro Tips */}
+          <Card className="border-green-500/20 bg-gradient-to-r from-green-500/5 to-blue-500/5">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Target className="h-5 w-5 text-green-500" />
+                <span>Pro Tips for Better Results</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">✓ Be Specific</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Use specific brand names, product names, or technical terms for more targeted results.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">✓ Use Synonyms</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Include variations and synonyms in "Any of these words" to capture different phrasings.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">✓ Combine Operators</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Mix different operators for complex searches (e.g., exact phrase + exclude terms).
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground">✓ Check Domain Format</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Enter domains without "http://" or "www" (e.g., example.com, not www.example.com).
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm">
